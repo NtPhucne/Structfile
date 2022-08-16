@@ -1,7 +1,6 @@
 #include <stdio.h>
-#include "string.h"
-#include "time.h"
-#include "conio.h"
+#include <string.h>
+#include <conio.h>
 #include <stdlib.h>
 
 struct date {
@@ -25,8 +24,10 @@ void xoaXuongDong(char x[]);
 void inSinhVien(SV sv);
 void nhapdanhsachsv(SV ds[], int& n);
 void capNhatSinhVien(SV &sv);
+int add_student(SV ds[], int& n);
 void getany();
 
+void sapXepDanhSachSinhVienTheoTen(SV ds[], int n);
 int searchbyname(SV ds[], int n, char ten[]);
 void sapXepDanhSachSinhVienTheodtl(SV ds[], int n);
 void sapXepDanhSachSinhVienTheoddv(SV ds[], int n);
@@ -80,8 +81,11 @@ void nhapdanhsachsv(SV ds[], int& n) {
 		nhapSinhVien(ds[i]);
 	}
 }
-void capNhatSinhVien(SV& sv) {
-	nhapSinhVien(sv);
+void capNhatSinhVien(SV ds[]) {
+	int i;
+	printf("Nhap stt cua sinh vien muon update");
+	printf("stt : %d", &i);
+	nhapSinhVien(ds[i]);
 }
 void xuatDanhSachSinhVien(SV ds[], int n) {
 	printf("%15s \t %10s \t %10s \t %10s \t %6s \t %6s \t %10s", "Ten", "Gioi Tinh", "Ngay Sinh", "Diem dv", "Diem tl", "Que Quan");
@@ -91,6 +95,7 @@ void xuatDanhSachSinhVien(SV ds[], int n) {
 		printf("\n");
 	}
 }
+
 int searchbysex(SV ds[], int n, char gioitinh[])
 {
 	for (int i = 0; i < n; i++) {
@@ -117,6 +122,18 @@ void sapXepDanhSachSinhVienTheoddv(SV ds[], int n) {
 	for (int i = 0; i < n - 1; i++) {
 		for (int j = i + 1; j < n; j++) {
 			if (ds[i].diemdv > ds[j].diemdv) {
+				SV temp;
+				temp = ds[i];
+				ds[i] = ds[j];
+				ds[j] = temp;
+			}
+		}
+	}
+}
+void sapXepDanhSachSinhVienTheoTen(SV ds[], int n) {
+	for (int i = 0; i < n - 1; i++) {
+		for (int j = i + 1; j < n; j++) {
+			if (strcmp(_strupr(ds[i].ten), _strupr(ds[j].ten)) > 0) {
 				SV temp;
 				temp = ds[i];
 				ds[i] = ds[j];
@@ -155,9 +172,9 @@ void get_File(SV ds[], int& n) {
 	fflush(stdin); fgets(tenFile, sizeof(tenFile), stdin); xoaXuongDong(tenFile);
 
 	FILE* f;
-	f = fopen(tenFile, "rb");
+	f = fopen(tenFile, "w+");
 	if (f == NULL) {
-		printf("\nLoi moi file de doc!");
+		printf("\nLoi mo file de doc!");
 		return;
 	}
 	fread(&n, sizeof(n), 1, f);
@@ -184,78 +201,104 @@ void set_File(SV ds[], int n) {
 	fclose(f);
 
 }
-
+int add_student(SV ds[],int  &n) {
+	SV sv_add;
+	
+	printf("Nhap thong tin sinh vien muon them");
+	nhapSinhVien(sv_add);
+	n = n + 1;
+	ds[n-1] = sv_add;
+	return n;
+	/*ds[n] = sv_add;*/
+	
+}
 
 int main() {
-	//SV sv1, arr[10];
-	//int n = 10; int i;
-	//for (i = 0; i < n; i++) {
-	//	nhapSinhVien(arr[i]);
-	//}
-	///*nhapSinhVien(sv1);*/
 	//printf("%15s \t %10s \t %10s \t %10s \t %6s \t %6s \t %10s", "Ten", "Gioi Tinh", "Ngay Sinh", "Diem dv", "Diem tl", "Que Quan");
-	//for (i = 0; i < n; i++) {
-	//	inSinhVien(arr[i]);
-
-	//inSinhVien(sv1);
 	SV ds[100]; int n; float diem; int chon;
-		//int n; char name[50];
-		//nhapdanhsachsv(ds, n);
-		//xuatDanhSachSinhVien(ds, n);
-		//printf("Nhap diem can tim: \n");
-		//float diem = 8.3;
-		///*scanf("%f", &name);*/
-		//searchbypoint(ds, n, diem);
+
 	do {
 		printf("\nMENU:");
 		printf("\n1- Nhap danh sach sinh vien");
 		printf("\n2- Xuat danh sach sinh vien");
-		printf("\n3- Xuat danh sach sinh vien loai");
-		printf("\n- Sap xep sinh vien theo Dtl");
-	
+		printf("\n3- Tim theo diem san`");
 		printf("\n4- Tim sinh vien theo ten");
 		printf("\n5- Xoa sinh vien theo Stt");
+		printf("\n6- Them sinh vien vao danh sach");
+		printf("\n7- Sap xep sinh vien theo ddv");
+		printf("\n8- Sap xep sinh vien theo dtl");
+		printf("\n9- Sap xep sinh vien theo ten");
+		printf("\n10- Lay thong tin sinh vien tu file");
+		printf("\n11- Luu thong tin sinh vien vao file");
 		printf("\n0- Thoat\n");
 		scanf("%d", &chon);
-	switch (chon) {
-	case 1:
-		printf("Nhap so luong sinh vien");
-		
-		nhapdanhsachsv(ds, n);
-		getany();
-		break;
-	case 2:
-		xuatDanhSachSinhVien(ds, n);
-		getany();
-		break;
-	case 3:
-		printf("\nDanh sach theo Dtl\n");
-		printf("Nhap diem san`");
-		scanf("%d", &diem);
-		searchbypoint(ds, n,diem);
-		getany();
-		break;
-	case 4:
-		char tensv[20];
-		char readnewline[10];
-		fgets(readnewline, sizeof(readnewline), stdin);
-		printf("\nNhap ten sinh vien can tim: "); fflush(stdin); fgets(tensv, sizeof(tensv), stdin); xoaXuongDong(tensv);
-		searchbyname(ds, n, tensv);
-		getany();
-		break;
-	case 5:
-		int stt;
-		printf("\nNhap stt can xoa"); scanf("%d", &stt);
-		printf("\nDanh sach sau khi xoa\n");
-		xoaSinhVienTheostt(ds, n, stt);
-		xuatDanhSachSinhVien(ds, n);
-		getany();
-		break;
+		switch (chon) {
+		case 1:
+			printf("Nhap so luong sinh vien");
+			nhapdanhsachsv(ds, n);
+			getany();
+			break;
+		case 2:
+			xuatDanhSachSinhVien(ds, n);
+			getany();
+			break;
+		case 3:
+			printf("\nDanh sach theo Dtl\n");
+			printf("Nhap diem san`");
+			scanf("%d", &diem);
+			searchbypoint(ds, n, diem);
+			getany();
+			break;
+		case 4:
+			char tensv[20];
+			char readnewline[10];
+			fgets(readnewline, sizeof(readnewline), stdin);
+			printf("\nNhap ten sinh vien can tim: "); fflush(stdin); fgets(tensv, sizeof(tensv), stdin); xoaXuongDong(tensv);
+			searchbyname(ds, n, tensv);
+			getany();
+			break;
+		case 5:
+			int stt;
+			printf("\nNhap stt can xoa"); scanf("%d", &stt);
+			printf("\nDanh sach sau khi xoa\n");
+			xoaSinhVienTheostt(ds, n, stt);
+			xuatDanhSachSinhVien(ds, n);
+			getany();
+			break;
+		case 6:
+			add_student(ds, n);
+			getany();
+			break;
+		case 7:
+			sapXepDanhSachSinhVienTheoddv(ds, n);
+			printf("Danh sach sau khi xep la\n");
+			xuatDanhSachSinhVien(ds, n);
+			getany();
+			break;
+		case 8:
+			sapXepDanhSachSinhVienTheodtl(ds, n);
+			printf("Danh sach sau khi xep la\n");
+			xuatDanhSachSinhVien(ds, n);
+			getany();
+			break;
+		case 9:
+			sapXepDanhSachSinhVienTheoTen(ds, n);
+			printf("Danh sach sau khi xep la\n");
+			xuatDanhSachSinhVien(ds, n);
+			getany();
+			break;
+		case 10:
+			get_File(ds, n);
+			getany();
+			break;
+		case 11:
+			set_File(ds, n);
+			getany();
+			break;
+		case 0:
+			break;
+		} while (chon != 0);
+
 	}
-} while (n != 0);
+
 }
-
-
-	
-
-
